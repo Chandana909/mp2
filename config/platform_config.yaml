@@ -1,0 +1,41 @@
+platform:
+  name: "ML Reliability Platform"
+  version: "1.0.0"
+
+storage:
+  models_path: "./models"
+  metadata_path: "./storage/metadata"
+  audit_logs_path: "./storage/audit_logs"
+
+monitoring:
+  drift_detection:
+    enabled: true
+    check_frequency_hours: 1
+    drift_threshold: 0.15
+    window_size: 1000  # number of recent predictions to analyze
+
+  metrics:
+    track_performance: true
+    performance_window_hours: 24
+
+lifecycle:
+  retraining:
+    auto_trigger_on_drift: true
+    drift_trigger_threshold: 0.20
+    consecutive_drift_triggers: 3
+
+  promotion:
+    criteria:
+      - metric: "accuracy"  # or "f1", "rmse", etc.
+        improvement_threshold: 0.02
+    require_manual_approval: false
+
+  rollback:
+    auto_rollback_on_performance_drop: true
+    performance_drop_threshold: 0.05
+
+serving:
+  host: "0.0.0.0"
+  port: 8000
+  workers: 4
+  log_level: "info"
