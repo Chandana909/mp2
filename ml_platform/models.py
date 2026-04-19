@@ -2,7 +2,7 @@
 Data structures for the registry (no external dependencies on storage).
 
 ModelMetadata is defined here to avoid circular imports between
-platform.registry and storage.metadata_store.
+ml_platform.registry and storage.metadata_store.
 """
 
 from dataclasses import dataclass

@@ -8,9 +8,9 @@ when performance drops below threshold.
 import logging
 from typing import Optional
 
-from platform.exceptions import ModelNotFoundError, RollbackError
-from platform.models import ModelMetadata
-from platform.registry import ModelRegistry
+from ml_platform.exceptions import ModelNotFoundError, RollbackError
+from ml_platform.models import ModelMetadata
+from ml_platform.registry import ModelRegistry
 
 logger = logging.getLogger(__name__)
 

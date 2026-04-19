@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+
+# Platform files
+models/
+storage/metadata/
+storage/audit_logs/
+logs/
+*.log
+*.pkl
+*.joblib
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Config
+*.local.yaml
+.env
+
+# Data
+data/
+*.csv
+*.parquet

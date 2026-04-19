@@ -3,9 +3,9 @@ platform:
   version: "1.0.0"
 
 storage:
-  models_path: "./models"
-  metadata_path: "./storage/metadata"
-  audit_logs_path: "./storage/audit_logs"
+  models_path: "models"
+  metadata_path: "storage/metadata"
+  audit_logs_path: "storage/audit_logs"
 
 monitoring:
   drift_detection:

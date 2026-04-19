@@ -1,9 +1,12 @@
-# ML Reliability Platform - Dependencies
-# Core
+# ML Reliability Platform — production dependencies
+# Install: pip install -r requirements.txt
+
+# Core API
 fastapi>=0.104.0
 uvicorn[standard]>=0.24.0
 pydantic>=2.5.0
 pydantic-settings>=2.1.0
+python-multipart>=0.0.6
 
 # Data & ML
 numpy>=1.24.0
@@ -12,13 +15,20 @@ scikit-learn>=1.3.0
 scipy>=1.11.0
 joblib>=1.3.0
 
-# Config & Storage
+# Monitoring & drift (optional Evidently for future dashboards)
+evidently>=0.4.0
+
+# Config & storage
 pyyaml>=6.0.0
+python-dateutil>=2.8.0
 
 # Testing
 pytest>=7.4.0
 pytest-asyncio>=0.21.0
 httpx>=0.25.0
 
-# Logging & Dev
+# Logging
 python-json-logger>=2.0.0
+
+# Metrics (optional at runtime; API degrades gracefully if missing)
+prometheus-client>=0.19.0

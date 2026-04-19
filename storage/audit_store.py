@@ -11,8 +11,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, List, Optional
 
-from platform.config import get_storage_paths
-from platform.exceptions import StorageError
+from ml_platform.config import get_storage_paths
+from ml_platform.exceptions import StorageError
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +33,7 @@ def _today_log_path() -> Path:
 class AuditStore:
     """Append-only audit log (JSONL) with query support."""
 
-    def __init__(self, audit_logs_path: Path | None = None):
+    def __init__(self, audit_logs_path: Optional[Path] = None):
         if audit_logs_path is None:
             audit_logs_path = _audit_log_dir()
         self._root = Path(audit_logs_path)
@@ -48,12 +48,13 @@ class AuditStore:
         """
         path = self._root / f"audit_{datetime.utcnow().strftime('%Y-%m-%d')}.jsonl"
         path.parent.mkdir(parents=True, exist_ok=True)
+        logger.debug("Appending audit log to %s", path)
         try:
             line = json.dumps(log_entry, default=str) + "\n"
             with open(path, "a", encoding="utf-8") as f:
                 f.write(line)
         except Exception as e:
-            logger.exception("Failed to write audit log")
+            logger.error("Failed to write audit log: %s", e, exc_info=True)
             raise StorageError(f"Failed to write audit log: {e}") from e
 
     def query_audit_logs(

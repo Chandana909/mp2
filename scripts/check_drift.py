@@ -18,7 +18,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import pandas as pd
 from monitoring.drift_detector import DriftDetector
-from platform.config import load_config
+from ml_platform.config import load_config
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

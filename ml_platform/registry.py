@@ -12,9 +12,9 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, List, Optional
 
-from platform.config import get_storage_paths
-from platform.exceptions import ModelNotFoundError, DuplicateModelError, StorageError
-from platform.models import ModelMetadata
+from ml_platform.config import get_storage_paths
+from ml_platform.exceptions import ModelNotFoundError, DuplicateModelError, StorageError
+from ml_platform.models import ModelMetadata
 from storage.model_store import ModelStore
 from storage.metadata_store import MetadataStore
 

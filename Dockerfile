@@ -8,7 +8,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application
-COPY platform/ platform/
+COPY ml_platform/ ml_platform/
 COPY storage/ storage/
 COPY monitoring/ monitoring/
 COPY lifecycle/ lifecycle/

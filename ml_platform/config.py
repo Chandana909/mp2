@@ -5,10 +5,13 @@ Loads platform_config.yaml and exposes settings via get_config().
 Uses a single config load; paths are relative to project root or explicit.
 """
 
+import logging
 from pathlib import Path
 from typing import Any, Optional
 
 import yaml
+
+logger = logging.getLogger(__name__)
 
 # Default path relative to project root (mp2 or ml-platform)
 _DEFAULT_CONFIG_PATH = Path(__file__).resolve().parent.parent / "config" / "platform_config.yaml"
@@ -29,13 +32,16 @@ def load_config(config_path: Optional[Path] = None) -> dict:
     global _config
     path = config_path or _DEFAULT_CONFIG_PATH
     if not path.exists():
+        logger.warning("Config file not found at %s; using defaults.", path)
         _config = _default_config()
         return _config
     try:
         with open(path, "r", encoding="utf-8") as f:
             _config = yaml.safe_load(f) or {}
+        logger.debug("Configuration loaded from %s", path)
         return _config
-    except Exception:
+    except Exception as e:
+        logger.warning("Failed to load config from %s: %s. Using defaults.", path, e)
         _config = _default_config()
         return _config
 
@@ -45,9 +51,9 @@ def _default_config() -> dict:
     return {
         "platform": {"name": "ML Reliability Platform", "version": "1.0.0"},
         "storage": {
-            "models_path": "./models",
-            "metadata_path": "./storage/metadata",
-            "audit_logs_path": "./storage/audit_logs",
+            "models_path": "models",
+            "metadata_path": "storage/metadata",
+            "audit_logs_path": "storage/audit_logs",
         },
         "monitoring": {
             "drift_detection": {
@@ -92,7 +98,7 @@ def get_config(key_path: Optional[str] = None) -> Any:
     return value
 
 
-def get_storage_paths() -> tuple[Path, Path, Path]:
+def get_storage_paths() -> tuple:
     """Return (models_path, metadata_path, audit_logs_path) as Paths."""
     root = Path(__file__).resolve().parent.parent
     cfg = get_config("storage") or {}

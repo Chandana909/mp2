@@ -8,7 +8,7 @@ notifications (email, Slack, etc.).
 import logging
 from typing import Any, Callable, Dict, List, Optional
 
-from platform.schema import DriftReport
+from ml_platform.schema import DriftReport
 
 logger = logging.getLogger(__name__)
 

@@ -1,0 +1,124 @@
+================================================================================
+ML RELIABILITY & LIFECYCLE SUPERVISION PLATFORM
+MASTER BLUEPRINT AND IMPLEMENTATION TECHNICAL SPECIFICATION
+================================================================================
+
+This document serves as the absolute source of truth for the entire platform. 
+It is written to be "painfully detailed" so that it can serve as a conceptual 
+textbook for a beginner to understand MLOps, as well as an exact generative 
+prompt to rebuild the entire codebase from scratch exactly as it exists today.
+
+--------------------------------------------------------------------------------
+PART 1: CONCEPTUAL UNDERSTANDING & PROBLEM STATEMENT
+--------------------------------------------------------------------------------
+1.1 The Machine Learning "Day 2" Problem
+When Data Scientists build an ML model (like a Random Forest checking for fraud), 
+they do it on static, historical CSV files. Once they get 95% accuracy, they save 
+their model as a binary blob file (e.g., using `joblib` or `pickle` in Python) 
+and hand it to engineers.
+
+But inserting that file into a live web application creates enormous risk:
+- Data Drift: If user behavior changes over 6 months, the model's accuracy will silently drop from 95% to 50% without anyone knowing, because the code didn't technically "crash".
+- Versioning Mess: Replacing 'model_final.joblib' with 'model_final_v2.joblib' requires restarting physical servers.
+- No Rollbacks: If the new model predicts terribly in production, engineers have no "undo" button because they overwrote the file.
+
+1.2 The Platform Solution
+This software engineers those problems out of existence. It creates a barricade 
+between raw ML models and the live production application.
+- It provides a centralized "Registry" database to track hundreds of models.
+- It exposes a unified REST API so engineers never touch a .joblib file directly. They just ask the API for predictions.
+- It features an autonomous Background Daemon that automatically monitors deployed models and swaps to better candidate models seamlessly with zero server downtime.
+
+--------------------------------------------------------------------------------
+PART 2: EXACT TECHNOLOGY STACK & DEPENDENCIES
+--------------------------------------------------------------------------------
+To recreate this platform, the following exact technologies and philosophies must be strictly adhered to:
+1. Backend Routing Framework: FastAPI (Python) running on Uvicorn workers. Chosen for its native async capabilities natively preventing input/output blocking when loading heavy model binaries into RAM.
+2. Relational Database Interface: Python `sqlite3` natively. Flat JSON files are strictly forbidden for metadata to avoid O(N) lookup degradation.
+3. Machine Learning Toolkit: Scikit-learn, Numpy, and Joblib.
+4. User Interface Toolkit: Vanilla Javascript (ES6), HTML5, and pure CSS. No frameworks like React/Angular. CSS utilizes a custom glassmorphic dark-theme UI style (`--bg: #0d1117`).
+5. Client SDK Toolkit: `httpx` for programmatic synchronous operations.
+
+--------------------------------------------------------------------------------
+PART 3: DIRECTORY STRUCTURE & FILE MANIFEST
+--------------------------------------------------------------------------------
+The project strictly conforms to this directory tree mapping. 
+
+C:/mp2/
+|-- run.py (The server bootstrapper)
+|-- requirements.txt (Dependencies map)
+|-- ml_platform_client.py (The drop-in Python SDK for programmatic clients)
+|-- PLATFORM_MASTER_BLUEPRINT.txt (This exact document)
+|
+|-- storage/
+|   |-- model_store.py (Handles saving/loading .joblib binary arrays)
+|   |-- metadata_store.py (Handles SQLite connection and SQL execution)
+|
+|-- ml_platform/
+|   |-- registry.py (The operational brain connecting the two stores securely)
+|   |-- models.py (Pydantic Dataclasses defining schema shapes)
+|   |-- validator.py (Pre-flight assertion checking input shapes)
+|   |-- audit.py (Appends logging rows to disk for predictions)
+|   |-- exceptions.py (Custom error classes like ModelNotFoundError)
+|   |-- config.py (Environment parameter mapping)
+|
+|-- serving/
+|   |-- api.py (FastAPI Routes and Background Daemon loops)
+|   |-- predictor.py (Inference engine extracting numpy predictions)
+|   |-- static/
+|       |-- index.html (The raw GUI HTML string)
+|
+|-- monitoring/
+|   |-- drift_simulator.py (Generates synthetic failing boundaries)
+|
+|-- lifecycle/
+|   |-- rollback.py (Executes failover logic routines to old Active models)
+|
+|-- scripts/
+    |-- demo_direct_usage.py (Example workflow)
+
+--------------------------------------------------------------------------------
+PART 4: PAINFULLY DETAILED COMPONENT ARCHITECTURE (How Everything works)
+--------------------------------------------------------------------------------
+
+4.1 The Persistence Layer (storage/metadata_store.py)
+This is the database engine.
+- MECHANISM: Upon initialization, it runs an implicit Schema generation locking a SQLite `metadata.db` locally.
+- SCHEMA: The table `model_metadata` contains `model_id` (PK), `model_name`, `version`, `model_type`, `features` (JSON string serialized), `target`, `metrics`, `status` (Candidate, Active, Retired), and `artifact_path`.
+- SPEED ENHANCEMENTS: Automatically builds B-Tree indices `CREATE INDEX idx_status` and `idx_model_name`.
+- WHY IT MATTERS: Because the UI constantly asks "What is the best active model right now?", checking 500 records via SQL indexed arrays takes 0.05ms instead of loading 500 flat JSON files into RAM.
+
+4.2 The Orchestration Brain (ml_platform/registry.py)
+This binds the SQLite metadata layer and the Joblib binary file system together.
+- MECHANISM: Uses Python `threading.RLock()`.
+- FUNCTION `update_model_status()`: Extremely critical. If a user sets a candidate version to 'Active', this function MUST run an SQL query finding any existing 'Active' version for the same model name, and forcibly downgrade that older version to 'Retired'. This prevents two models fighting to serve the same endpoint.
+
+4.3 The REST Controller & Autonomous Daemon (serving/api.py)
+This is the FastAPI entry point holding the Routes.
+- ROUTE: POST `/models/upload`. Receives `multipart/form-data`. It verifies the upload contains a `.predict()` method to guarantee it is actually an ML model, wraps it in joblib, asks the Registry to generate an ID, and sets its status as "Candidate".
+- ROUTE: POST `/predict`. Receives JSON values. Validates the keys mathematically match the `features` defined in SQLite metadata. Evaluates `model.predict()`. Returns prediction array and passes exact inputs to `audit.py`.
+- THE DAEMON: Within the `@asynccontextmanager`, a task runs iteratively executing `await asyncio.sleep(3600)` (1 hour). It fetches all candidates natively. It finds the candidate with the numeric maximum `accuracy` metadata score. If that candidate's score is mathematically greater than the existing active model's score, it bypasses human intervention and directly calls `registry.update_model_status()`, deploying the new model effortlessly.
+
+4.4 The User Interface (serving/static/index.html)
+No backend templating engines (like Jinja) exist. The FastAPI server renders a pure 100% static HTML object. Once loaded in the browser, vanilla JS runs a `fetch('/stats')` asynchronous callback mapping JSON objects into Document Object Model nodes. 
+- UI CONSTRAINTS: Must use flexbox and CSS grids. The "Direct Upload Form" directly maps file streams utilizing JavaScripts `FormData()` class into the `/models/upload` endpoint. 
+
+4.5 The SDK Client (ml_platform_client.py)
+To prevent engineers from manually constructing complicated HTTP requests, an SDK wraps everything locally. 
+- INSTANTIATION: `client = MLPlatformClient("http://localhost:8000")`
+- EXECUTION: Uses the `httpx` module. 
+- FUNCTION `trigger_pipeline()` maps explicitly to `/pipeline/retrain`. It forces an immediate execution returning the new model identifier synchronously. 
+
+--------------------------------------------------------------------------------
+PART 5: HOW TO GENERATE / REBUILD FROM SCRATCH
+--------------------------------------------------------------------------------
+If attempting to rebuild this project natively using an AI system or manual programming, utilize the following precise flow rules:
+
+1. Always build the `storage` subsystem first. Build SQLite tables natively overriding legacy JSON configurations if encountered.
+2. Build the `registry.py` wrapper class enforcing `RLock` mapping on all storage access methods.
+3. Construct Pydantic standard datamodels mapping incoming JSON schemas (e.g. `{"age": 5, "geo": 3}`).
+4. Wire the Core API logic mapping HTTP endpoints directly to native `registry` triggers.
+5. Embed the exact Daemon asynchronous context manager strictly firing loop mechanics comparing floats.
+6. Design the front-end string matching dark-glass patterns appending DOM elements natively via Fetch responses without framework libraries.
+7. Wrap structural commands mapping `httpx` execution rules locally natively building `ml_platform_client.py`.
+================================================================================

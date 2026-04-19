@@ -8,9 +8,9 @@ Raises ValidationError with clear messages for API responses.
 import logging
 from typing import Any, Dict, List, Optional, Tuple
 
-from platform.exceptions import ValidationError
-from platform.models import ModelMetadata
-from platform.schema import PredictionRequest
+from ml_platform.exceptions import ValidationError
+from ml_platform.models import ModelMetadata
+from ml_platform.schema import PredictionRequest
 
 logger = logging.getLogger(__name__)
 

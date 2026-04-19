@@ -3,9 +3,9 @@
 import pytest
 from datetime import datetime
 
-from platform.registry import ModelRegistry
-from platform.exceptions import ModelNotFoundError, DuplicateModelError
-from platform.models import ModelMetadata
+from ml_platform.registry import ModelRegistry
+from ml_platform.exceptions import ModelNotFoundError, DuplicateModelError
+from ml_platform.models import ModelMetadata
 
 
 def test_register_and_get_model(registry, sample_model, sample_metadata):

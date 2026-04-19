@@ -15,10 +15,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from platform.registry import ModelRegistry
-from platform.exceptions import ModelNotFoundError, PromotionError
+from ml_platform.registry import ModelRegistry
+from ml_platform.exceptions import ModelNotFoundError, PromotionError
 from lifecycle.promoter import ModelPromoter
-from platform.config import load_config
+from ml_platform.config import load_config
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

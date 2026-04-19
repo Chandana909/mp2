@@ -10,7 +10,7 @@ from monitoring.metrics import (
     compute_prediction_statistics,
     track_model_performance,
 )
-from platform.schema import DriftReport
+from ml_platform.schema import DriftReport
 
 
 def test_compute_feature_statistics():

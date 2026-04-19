@@ -4,8 +4,8 @@ import pytest
 from fastapi.testclient import TestClient
 
 from serving.api import create_app, get_registry, get_validator, get_audit, get_predictor
-from platform.registry import ModelRegistry
-from platform.models import ModelMetadata
+from ml_platform.registry import ModelRegistry
+from ml_platform.models import ModelMetadata
 
 
 @pytest.fixture

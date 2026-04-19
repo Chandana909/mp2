@@ -54,7 +54,7 @@ class DriftReport(BaseModel):
     feature_drifts: Dict[str, float] = Field(default_factory=dict, description="Per-feature drift scores")
     timestamp: datetime = Field(default_factory=datetime.utcnow, description="Report timestamp")
 
-    model_config = {"json_schema_extra": {"example": {"model_id": "fraud_detector_v1_abc", "drift_detected": True, "drift_score": 0.22, "feature_drifts": {"amount": 0.15, "time_of_day": 0.31}, "timestamp": "2026-02-01T10:30:00Z"}}
+    model_config = {"json_schema_extra": {"example": {"model_id": "fraud_detector_v1_abc", "drift_detected": True, "drift_score": 0.22, "feature_drifts": {"amount": 0.15, "time_of_day": 0.31}, "timestamp": "2026-02-01T10:30:00Z"}}}
 
 
 class ModelInfo(BaseModel):

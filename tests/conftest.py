@@ -12,9 +12,9 @@ import pandas as pd
 import pytest
 from sklearn.ensemble import RandomForestClassifier
 
-from platform.config import load_config
-from platform.registry import ModelRegistry
-from platform.models import ModelMetadata
+from ml_platform.config import load_config
+from ml_platform.registry import ModelRegistry
+from ml_platform.models import ModelMetadata
 from storage.model_store import ModelStore
 from storage.metadata_store import MetadataStore
 from storage.audit_store import AuditStore

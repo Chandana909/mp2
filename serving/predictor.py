@@ -10,7 +10,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 
-from platform.models import ModelMetadata
+from ml_platform.models import ModelMetadata
 
 logger = logging.getLogger(__name__)
 

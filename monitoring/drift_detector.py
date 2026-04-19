@@ -14,7 +14,7 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 
-from platform.schema import DriftReport
+from ml_platform.schema import DriftReport
 
 logger = logging.getLogger(__name__)
 
@@ -118,6 +118,16 @@ class DriftDetector:
             feature_drifts[col] = round(score, 4)
         drift_score = float(np.mean(list(feature_drifts.values()))) if feature_drifts else 0.0
         drift_detected = drift_score > self.drift_threshold
+        if drift_detected:
+            logger.info(
+                "Data drift detected: model_id=%s, score=%.4f, threshold=%.4f",
+                model_id,
+                drift_score,
+                self.drift_threshold,
+                extra={"model_id": model_id, "drift_score": drift_score, "feature_drifts": feature_drifts},
+            )
+        else:
+            logger.debug("No data drift: model_id=%s, score=%.4f", model_id, drift_score)
         return DriftReport(
             model_id=model_id,
             drift_detected=drift_detected,

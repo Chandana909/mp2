@@ -11,8 +11,8 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 import pandas as pd
 
-from platform.models import ModelMetadata
-from platform.registry import ModelRegistry
+from ml_platform.models import ModelMetadata
+from ml_platform.registry import ModelRegistry
 
 logger = logging.getLogger(__name__)
 

@@ -10,9 +10,9 @@ import logging
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-from platform.schema import PredictionRequest, PredictionResponse
+from ml_platform.schema import PredictionRequest, PredictionResponse
 from storage.audit_store import AuditStore
-from platform.config import get_storage_paths
+from ml_platform.config import get_storage_paths
 
 logger = logging.getLogger(__name__)
 

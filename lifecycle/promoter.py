@@ -8,8 +8,8 @@ and supports optional safe promotion with A/B traffic split.
 import logging
 from typing import Any, Dict, Optional
 
-from platform.exceptions import PromotionError
-from platform.registry import ModelRegistry
+from ml_platform.exceptions import PromotionError
+from ml_platform.registry import ModelRegistry
 
 logger = logging.getLogger(__name__)
 
